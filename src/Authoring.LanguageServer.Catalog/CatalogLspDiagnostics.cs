@@ -21,7 +21,9 @@ internal static class CatalogLspDiagnostics
         new()
         {
             Range = new Range(new Position(Math.Max(0, d.Line - 1), d.Column), new Position(Math.Max(0, d.Line - 1), d.Column + 1)),
-            Severity = d.Code == AuthoringDiagnosticCode.NotationWireMismatch
+            Severity = d.Code is AuthoringDiagnosticCode.GrammarWireMismatch
+                or AuthoringDiagnosticCode.UnknownGrammarId
+                or AuthoringDiagnosticCode.MissingGrammarDeclaration
                 ? DiagnosticSeverity.Error
                 : DiagnosticSeverity.Warning,
             Source = "authoring-catalog",

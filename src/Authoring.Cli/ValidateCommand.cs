@@ -32,9 +32,10 @@ internal static class ValidateCommand
         }
 
         var fatal = result.Diagnostics.Any(static d =>
-            d.Code is AuthoringDiagnosticCode.NotationWireMismatch
+            d.Code is AuthoringDiagnosticCode.GrammarWireMismatch
                 or AuthoringDiagnosticCode.MissingCatalogHeader
-                or AuthoringDiagnosticCode.MissingNotationDeclaration
+                or AuthoringDiagnosticCode.MissingGrammarDeclaration
+                or AuthoringDiagnosticCode.UnknownGrammarId
                 or AuthoringDiagnosticCode.InvalidSyntax);
 
         if (fatal)

@@ -1,8 +1,12 @@
 # Lab 01 — catalog skeleton
 
-1. Create `catalog myplanet` header.
-2. Add `channels` with one `slash` sub and **explicit** `command-notation` + `argument-notation`.
-3. Add `defaults` with `command.surfaces` and `variable.kind`.
-4. Run `authoring validate myplanet.catalog` — must pass with zero notation-wire-mismatch.
+1. Start with `catalog <planet>` header.
+2. Add `channels` with one `slash` sub, nested `grammar` block (`command` + `argument` ids).
+3. Declare `defaults` (`variable.kind`, `command.surfaces`, …).
+4. Add an empty `commands table`.
 
-See `dash-spec/src/DashSpec.Host/Catalog/dash.catalog` for a full planet example.
+Validate:
+
+```bash
+authoring validate samples/catalog/dash.catalog
+```

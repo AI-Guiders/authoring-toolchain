@@ -2,23 +2,38 @@
 
 Prerequisites: [01-catalog-skeleton](01-catalog-skeleton.md).
 
-## Keyboard defaults
+## Keyboard grammars
 
-Declare the alphabet before writing wire:
+Declare string grammars before writing wire:
 
 ```catalog
 defaults
-  notation.keyboard.binding  = keyboard-key-gesture
-  notation.keyboard.melody   = keyboard-key-gesture
-  binding.chord-root         = Ctrl+K
+  grammar.keyboard.binding  = keyboard-key-gesture
+  grammar.keyboard.melody   = keyboard-key-gesture
+  binding.chord-root        = Ctrl+K
 end defaults
 ```
 
-`Ctrl+K` in `bindings` must parse as **key-gesture** wire. A Vim-style `fd` slug belongs in `melodies`, not bindings.
+`Ctrl+K` in `bindings` must parse as **keyboard-key-gesture** wire. Vim slugs like `fd` belong in `melodies` when `grammar.keyboard.melody = keyboard-vim`.
+
+## Line grammars per channel
+
+```catalog
+channels
+  console
+    filter = filter-bar
+    grammar
+      command = command-console
+      argument = argument-kv
+    end grammar
+end channels
+```
+
+Grammar ids are federation SSOT — see `docs/grammar/notation/` in guiders-platform.
 
 ## MCP projection
 
-`mcp` is a **projection**, not a command surface:
+`mcp` is a **projection**, not a surface:
 
 ```catalog
 mcp table
@@ -27,14 +42,13 @@ mcp table
 end mcp
 ```
 
-Validate and emit:
-
 ```bash
 authoring validate samples/catalog/dash.catalog
 authoring emit samples/catalog/dash.catalog --namespace DashSpec.Generated --class DashCatalog
 ```
 
-## Compile errors to expect
+## Compile errors
 
-- `notation-wire-mismatch` — gesture does not match `notation.keyboard.*`
-- Missing `command-notation` on a channel → `missing-notation-declaration`
+- `grammar-wire-mismatch` — cell does not match declared `grammar.*` id
+- `missing-grammar-declaration` — line channel without `grammar` block
+- `unknown-grammar-id` — id not in `NotationGrammarRegistry`
