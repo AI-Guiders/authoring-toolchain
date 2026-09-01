@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Authoring.Command.Bundles\AIGuiders.Platform.Authoring.Command.Bundles.csproj" />
     <ProjectReference Include="..\Authoring.Toolchain.Host\Authoring.Toolchain.Host.csproj" />
   </ItemGroup>
 

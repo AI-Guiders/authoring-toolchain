@@ -1,3 +1,4 @@
+using AIGuiders.Platform.Authoring.Command.Bundles;
 using AIGuiders.Platform.Authoring.Command.Catalog;
 using AIGuiders.Platform.CommandPlane.Catalog.CodeGen;
 
@@ -34,7 +35,7 @@ internal static class EmitCommand
             }
         }
 
-        var result = CatalogParser.ParseFile(path);
+        var result = CatalogParser.ParseFile(path, CatalogBundleLibrary.Federation);
         if (result.Document is null)
         {
             foreach (var diagnostic in result.Diagnostics)

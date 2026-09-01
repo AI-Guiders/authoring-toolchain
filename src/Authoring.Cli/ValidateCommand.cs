@@ -1,3 +1,4 @@
+using AIGuiders.Platform.Authoring.Command.Bundles;
 using AIGuiders.Platform.Authoring.Command.Catalog;
 using AIGuiders.Platform.Authoring.Core;
 
@@ -20,7 +21,7 @@ internal static class ValidateCommand
             return 1;
         }
 
-        var result = CatalogParser.ParseFile(path);
+        var result = CatalogParser.ParseFile(path, CatalogBundleLibrary.Federation);
         foreach (var diagnostic in result.Diagnostics)
         {
             Console.Error.WriteLine($"{diagnostic.Code}: {diagnostic.Message}");
@@ -36,6 +37,8 @@ internal static class ValidateCommand
                 or AuthoringDiagnosticCode.MissingCatalogHeader
                 or AuthoringDiagnosticCode.MissingGrammarDeclaration
                 or AuthoringDiagnosticCode.UnknownGrammarId
+                or AuthoringDiagnosticCode.UnknownBundle
+                or AuthoringDiagnosticCode.UnknownProfile
                 or AuthoringDiagnosticCode.InvalidSyntax);
 
         if (fatal)
@@ -59,7 +62,7 @@ internal static class SummaryCommand
         }
 
         var path = Path.GetFullPath(args[0]);
-        var result = CatalogParser.ParseFile(path);
+        var result = CatalogParser.ParseFile(path, CatalogBundleLibrary.Federation);
         if (result.Document is null)
         {
             return 1;

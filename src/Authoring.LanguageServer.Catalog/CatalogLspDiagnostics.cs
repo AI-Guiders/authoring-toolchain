@@ -1,3 +1,4 @@
+using AIGuiders.Platform.Authoring.Command.Bundles;
 using AIGuiders.Platform.Authoring.Command.Catalog;
 using AIGuiders.Platform.Authoring.Core;
 
@@ -13,7 +14,7 @@ internal static class CatalogLspDiagnostics
 
     public static Container<Diagnostic> Analyze(string text)
     {
-        var result = CatalogParser.Parse(text);
+        var result = CatalogParser.Parse(text, bundleLibrary: CatalogBundleLibrary.Federation);
         return ToLsp(result.Diagnostics);
     }
 
@@ -24,6 +25,8 @@ internal static class CatalogLspDiagnostics
             Severity = d.Code is AuthoringDiagnosticCode.GrammarWireMismatch
                 or AuthoringDiagnosticCode.UnknownGrammarId
                 or AuthoringDiagnosticCode.MissingGrammarDeclaration
+                or AuthoringDiagnosticCode.UnknownBundle
+                or AuthoringDiagnosticCode.UnknownProfile
                 ? DiagnosticSeverity.Error
                 : DiagnosticSeverity.Warning,
             Source = "authoring-catalog",
