@@ -1,3 +1,6 @@
+using AIGuiders.Platform.Authoring.Command.Catalog;
+using AIGuiders.Platform.Authoring.Core;
+
 namespace Authoring.Cli;
 
 internal static class ValidateCommand
@@ -17,14 +20,51 @@ internal static class ValidateCommand
             return 1;
         }
 
-        var text = File.ReadAllText(path);
-        if (!text.Contains("catalog ", StringComparison.Ordinal))
+        var result = CatalogParser.ParseFile(path);
+        foreach (var diagnostic in result.Diagnostics)
         {
-            Console.Error.WriteLine("validate: missing `catalog` header");
+            Console.Error.WriteLine($"{diagnostic.Code}: {diagnostic.Message}");
+        }
+
+        if (result.Document is null)
+        {
             return 1;
         }
 
-        Console.WriteLine($"validate: ok (stub) — {path}");
+        var fatal = result.Diagnostics.Any(static d =>
+            d.Code is AuthoringDiagnosticCode.NotationWireMismatch
+                or AuthoringDiagnosticCode.MissingCatalogHeader
+                or AuthoringDiagnosticCode.MissingNotationDeclaration
+                or AuthoringDiagnosticCode.InvalidSyntax);
+
+        if (fatal)
+        {
+            return 1;
+        }
+
+        Console.WriteLine($"validate: ok — {CatalogSummary.Format(result.Document)}");
+        return 0;
+    }
+}
+
+internal static class SummaryCommand
+{
+    public static int Run(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.Error.WriteLine("summary: missing file path");
+            return 2;
+        }
+
+        var path = Path.GetFullPath(args[0]);
+        var result = CatalogParser.ParseFile(path);
+        if (result.Document is null)
+        {
+            return 1;
+        }
+
+        Console.WriteLine(CatalogSummary.Format(result.Document));
         return 0;
     }
 }

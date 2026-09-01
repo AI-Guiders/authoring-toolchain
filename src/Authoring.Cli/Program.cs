@@ -1,4 +1,5 @@
 ﻿using Authoring.Cli;
+using AIGuiders.Platform.Authoring.Command.Catalog;
 
 if (args.Length == 0)
 {
@@ -9,6 +10,8 @@ if (args.Length == 0)
 return args[0] switch
 {
     "validate" => ValidateCommand.Run(args.Skip(1).ToArray()),
+    "summary" => SummaryCommand.Run(args.Skip(1).ToArray()),
+    "emit" => EmitCommand.Run(args.Skip(1).ToArray()),
     "--version" or "-v" => PrintVersion(),
     "--help" or "-h" or "help" => PrintUsage(),
     _ => Unknown(args[0]),
@@ -16,7 +19,7 @@ return args[0] switch
 
 static int PrintVersion()
 {
-    Console.WriteLine("authoring 0.1.0");
+    Console.WriteLine("authoring 0.2.0");
     return 0;
 }
 
@@ -24,10 +27,12 @@ static int PrintUsage()
 {
     Console.WriteLine(
         """
-        authoring — federation authoring toolchain CLI (scaffold)
+        authoring — federation .catalog toolchain
 
         Usage:
-          authoring validate <file.catalog>   Stub validate (header check)
+          authoring validate <file.catalog>
+          authoring summary <file.catalog>
+          authoring emit <file.catalog> [--namespace N] [--class C]
           authoring --version
           authoring --help
         """);

@@ -2,12 +2,16 @@
 
 Progressive authoring tutorials for humans. Agents use ADR + parser in `guiders-platform`; this folder is the **human ramp**.
 
-## Planned
+| Lab | File | Goal |
+|-----|------|------|
+| 01 | [01-catalog-skeleton.md](01-catalog-skeleton.md) | `catalog` header, `defaults`, `commands table` skeleton |
+| 02 | [02-bindings-melodies-mcp.md](02-bindings-melodies-mcp.md) | keyboard notation, bindings, melodies, MCP projection |
 
-| Lab | Goal |
-|-----|------|
-| `01-catalog-skeleton` | `catalog` header, `defaults`, empty `commands table` |
-| `02-first-command` | one row: phrase + profile + helps |
-| `03-channels-surfaces` | `channels` + `command.surfaces` wiring |
+Run against samples:
 
-DashSpec labs stay in [dash-spec/docs](https://github.com/AI-Guiders/dash-spec/tree/main/docs) until shared kit lands.
+```bash
+authoring validate samples/catalog/dash.catalog
+authoring summary samples/catalog/dash.catalog
+```
+
+DashSpec product labs stay in [dash-spec/docs](https://github.com/AI-Guiders/dash-spec/tree/main/docs).

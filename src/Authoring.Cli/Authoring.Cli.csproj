@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>Authoring.Cli</RootNamespace>
@@ -7,9 +6,9 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>authoring</ToolCommandName>
   </PropertyGroup>
-
   <ItemGroup>
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />
+    <ProjectReference Include="..\..\..\guiders-platform\src\AIGuiders.Platform.CommandPlane.Catalog.CodeGen\AIGuiders.Platform.CommandPlane.Catalog.CodeGen.csproj" />
     <ProjectReference Include="..\Authoring.Toolchain.Host\Authoring.Toolchain.Host.csproj" />
   </ItemGroup>
-
 </Project>

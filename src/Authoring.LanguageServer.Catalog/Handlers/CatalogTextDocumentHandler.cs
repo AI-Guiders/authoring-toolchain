@@ -50,7 +50,7 @@ internal sealed class CatalogTextDocumentHandler : TextDocumentSyncHandlerBase
             new PublishDiagnosticsParams
             {
                 Uri = uri,
-                Diagnostics = new Container<Diagnostic>(CatalogStubDiagnostics.Analyze(uri, text)),
+                Diagnostics = new Container<Diagnostic>(CatalogLspDiagnostics.Analyze(text ?? string.Empty)),
             });
 
         return Unit.Task;
