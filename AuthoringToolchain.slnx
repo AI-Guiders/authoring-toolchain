@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Authoring.Cli/Authoring.Cli.csproj" />
+    <Project Path="src/Authoring.LanguageServer.Catalog/Authoring.LanguageServer.Catalog.csproj" />
+    <Project Path="src/Authoring.Toolchain.Host/Authoring.Toolchain.Host.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Authoring.LanguageServer.Catalog</RootNamespace>
+    <AssemblyName>Authoring.LanguageServer.Catalog</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Authoring.Toolchain.Host\Authoring.Toolchain.Host.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.9" />
+    <PackageReference Include="OmniSharp.Extensions.LanguageProtocol" Version="0.19.9" />
+  </ItemGroup>
+
+  <!-- Wave 2: AIGuiders.Platform.Authoring.Command.Catalog -->
+
+</Project>

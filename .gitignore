@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.bak
+publish/
+TestResults/
+
+node_modules/
+*.vsix
+extensions/vscode-*/server/
+
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,45 @@
+{
+  "name": "guiders-catalog",
+  "displayName": "Guiders Catalog",
+  "description": "Syntax highlighting and LSP scaffold for federation .catalog authoring",
+  "version": "0.1.0",
+  "publisher": "ai-guiders",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:catalog"
+  ],
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "catalog",
+        "aliases": [
+          "Guiders Catalog",
+          "Catalog"
+        ],
+        "extensions": [
+          ".catalog",
+          ".catalogbundle"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "catalog",
+        "scopeName": "source.catalog",
+        "path": "./syntaxes/catalog.tmLanguage.json"
+      }
+    ]
+  }
+}

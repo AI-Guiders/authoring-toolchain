@@ -1,0 +1,27 @@
+catalog dash
+
+channels
+  slash
+    bar = toolbar-slash
+  palette = command-palette
+end channels
+
+defaults
+  variable.kind    = phrase-slot
+  command.scope    = dashboard
+  command.surfaces = slash.bar, palette
+end defaults
+
+variables
+  filter
+end variables
+
+phrases table
+  | name           | phrase                 |
+  | filter-by-name | select filter {filter} |
+end phrases
+
+commands table
+  | command     | phrase         | profile    | expand               | fills  |
+  | filter.date | filter-by-name | date-value | toolbar-filters date | filter |
+end commands

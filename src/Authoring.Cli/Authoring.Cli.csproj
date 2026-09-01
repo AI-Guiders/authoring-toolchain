@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Authoring.Cli</RootNamespace>
+    <AssemblyName>authoring</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>authoring</ToolCommandName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Authoring.Toolchain.Host\Authoring.Toolchain.Host.csproj" />
+  </ItemGroup>
+
+</Project>

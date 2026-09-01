@@ -1,0 +1,27 @@
+{
+  "name": "catalog",
+  "scopeName": "source.catalog",
+  "patterns": [
+    { "include": "#keywords" },
+    { "include": "#strings" }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.catalog",
+          "match": "\\b(catalog|import|channels|defaults|variables|helps|phrases|profiles|commands|executors|end|table)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.catalog",
+          "begin": "\"",
+          "end": "\""
+        }
+      ]
+    }
+  }
+}
