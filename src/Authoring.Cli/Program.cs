@@ -30,9 +30,9 @@ static int PrintUsage()
         authoring — federation .catalog toolchain
 
         Usage:
-          authoring validate <file.catalog>
-          authoring summary <file.catalog>
-          authoring emit <file.catalog> [--namespace N] [--class C]
+          authoring validate <file.catalog> [--workspace <root>]
+          authoring summary <file.catalog> [--workspace <root>]
+          authoring emit <file.catalog> [--workspace <root>] [--namespace N] [--class C]
           authoring --version
           authoring --help
         """);

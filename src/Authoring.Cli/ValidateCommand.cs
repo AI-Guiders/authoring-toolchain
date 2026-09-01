@@ -1,52 +1,40 @@
-using AIGuiders.Platform.Authoring.Command.Bundles;
+namespace Authoring.Cli;
+
 using AIGuiders.Platform.Authoring.Command.Catalog;
 using AIGuiders.Platform.Authoring.Core;
-
-namespace Authoring.Cli;
 
 internal static class ValidateCommand
 {
     public static int Run(string[] args)
     {
-        if (args.Length == 0)
+        if (!CliCatalogWorkspace.TryParseCatalogArgs(args, out var path, out var workspaceRoot, out _))
         {
             Console.Error.WriteLine("validate: missing file path");
             return 2;
         }
 
-        var path = Path.GetFullPath(args[0]);
         if (!File.Exists(path))
         {
             Console.Error.WriteLine($"validate: file not found: {path}");
             return 1;
         }
 
-        var result = CatalogParser.ParseFile(path, CatalogBundleLibrary.Federation);
-        foreach (var diagnostic in result.Diagnostics)
-        {
-            Console.Error.WriteLine($"{diagnostic.Code}: {diagnostic.Message}");
-        }
+        var result = CatalogCliSupport.OpenProject(path, workspaceRoot);
+        CatalogCliSupport.WriteDiagnostics(result.Diagnostics);
 
         if (result.Document is null)
         {
             return 1;
         }
 
-        var fatal = result.Diagnostics.Any(static d =>
-            d.Code is AuthoringDiagnosticCode.GrammarWireMismatch
-                or AuthoringDiagnosticCode.MissingCatalogHeader
-                or AuthoringDiagnosticCode.MissingGrammarDeclaration
-                or AuthoringDiagnosticCode.UnknownGrammarId
-                or AuthoringDiagnosticCode.UnknownBundle
-                or AuthoringDiagnosticCode.UnknownProfile
-                or AuthoringDiagnosticCode.InvalidSyntax);
-
-        if (fatal)
+        if (CatalogCliSupport.HasFatalDiagnostics(result.Diagnostics))
         {
             return 1;
         }
 
-        Console.WriteLine($"validate: ok — {CatalogSummary.Format(result.Document)}");
+        var importCount = result.Project?.Documents.Count(static d => d.Ref.Kind == AuthoringDocumentKind.FederationImport) ?? 0;
+        Console.WriteLine(
+            $"validate: ok — {CatalogSummary.Format(result.Document)} (project docs: {result.Project?.Documents.Count ?? 0}, wire imports: {importCount})");
         return 0;
     }
 }
@@ -55,16 +43,16 @@ internal static class SummaryCommand
 {
     public static int Run(string[] args)
     {
-        if (args.Length == 0)
+        if (!CliCatalogWorkspace.TryParseCatalogArgs(args, out var path, out var workspaceRoot, out _))
         {
             Console.Error.WriteLine("summary: missing file path");
             return 2;
         }
 
-        var path = Path.GetFullPath(args[0]);
-        var result = CatalogParser.ParseFile(path, CatalogBundleLibrary.Federation);
+        var result = CatalogCliSupport.OpenProject(path, workspaceRoot);
         if (result.Document is null)
         {
+            CatalogCliSupport.WriteDiagnostics(result.Diagnostics);
             return 1;
         }
 

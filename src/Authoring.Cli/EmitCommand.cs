@@ -1,4 +1,3 @@
-using AIGuiders.Platform.Authoring.Command.Bundles;
 using AIGuiders.Platform.Authoring.Command.Catalog;
 using AIGuiders.Platform.CommandPlane.Catalog.CodeGen;
 
@@ -8,13 +7,12 @@ internal static class EmitCommand
 {
     public static int Run(string[] args)
     {
-        if (args.Length == 0)
+        if (!CliCatalogWorkspace.TryParseCatalogArgs(args, out var path, out var workspaceRoot, out var passthrough))
         {
             Console.Error.WriteLine("emit: missing file path");
             return 2;
         }
 
-        var path = Path.GetFullPath(args[0]);
         if (!File.Exists(path))
         {
             Console.Error.WriteLine($"emit: file not found: {path}");
@@ -23,26 +21,22 @@ internal static class EmitCommand
 
         var namespaceName = "Generated.Catalog";
         var className = "PlanetCatalog";
-        for (var i = 1; i < args.Length; i++)
+        for (var i = 1; i < passthrough.Length; i++)
         {
-            if (args[i] is "--namespace" && i + 1 < args.Length)
+            if (passthrough[i] is "--namespace" && i + 1 < passthrough.Length)
             {
-                namespaceName = args[++i];
+                namespaceName = passthrough[++i];
             }
-            else if (args[i] is "--class" && i + 1 < args.Length)
+            else if (passthrough[i] is "--class" && i + 1 < passthrough.Length)
             {
-                className = args[++i];
+                className = passthrough[++i];
             }
         }
 
-        var result = CatalogParser.ParseFile(path, CatalogBundleLibrary.Federation);
+        var result = CatalogCliSupport.OpenProject(path, workspaceRoot);
         if (result.Document is null)
         {
-            foreach (var diagnostic in result.Diagnostics)
-            {
-                Console.Error.WriteLine($"{diagnostic.Code}: {diagnostic.Message}");
-            }
-
+            CatalogCliSupport.WriteDiagnostics(result.Diagnostics);
             return 1;
         }
 
