@@ -1,5 +1,5 @@
 using AIGuiders.Platform.Authoring.Command.Catalog;
-using AIGuiders.Platform.CommandPlane.Catalog.CodeGen;
+using AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen;
 
 namespace Authoring.Cli;
 

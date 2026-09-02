@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/authoring-toolchain
+          path: federation/authoring-toolchain
+
+      - uses: actions/checkout@v4
+        with:
+          repository: AI-Guiders/guiders-dotnet-platform
+          path: federation/guiders-platform
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        working-directory: federation/authoring-toolchain
+        run: |
+          dotnet restore AuthoringToolchain.slnx
+          dotnet build AuthoringToolchain.slnx --no-restore -c Release
