@@ -10,8 +10,8 @@ Progressive authoring tutorials for humans. Agents use ADR + parser in `guiders-
 Run against samples:
 
 ```bash
-authoring validate samples/catalog/dash.catalog
-authoring summary samples/catalog/dash.catalog
+authoring validate samples/catalog/dash.catalog.gdl
+authoring summary samples/catalog/dash.catalog.gdl
 ```
 
 DashSpec product labs stay in [dash-spec/docs](https://github.com/AI-Guiders/dash-spec/tree/main/docs).

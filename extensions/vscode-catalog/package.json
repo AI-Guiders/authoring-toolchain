@@ -1,7 +1,7 @@
 {
   "name": "guiders-catalog",
   "displayName": "Guiders Catalog",
-  "description": "Syntax highlighting and LSP scaffold for federation .catalog authoring",
+  "description": "Syntax highlighting and LSP scaffold for federation GDL catalog quarries",
   "version": "0.1.0",
   "publisher": "ai-guiders",
   "license": "MIT",
@@ -28,8 +28,8 @@
           "Catalog"
         ],
         "extensions": [
-          ".catalog",
-          ".catalogbundle"
+          ".catalog.gdl",
+          ".catalogbundle.gdl"
         ],
         "configuration": "./language-configuration.json"
       }

@@ -43,8 +43,8 @@ end mcp
 ```
 
 ```bash
-authoring validate samples/catalog/dash.catalog
-authoring emit samples/catalog/dash.catalog --namespace DashSpec.Generated --class DashCatalog
+authoring validate samples/catalog/dash.catalog.gdl
+authoring emit samples/catalog/dash.catalog.gdl --namespace DashSpec.Generated --class DashCatalog
 ```
 
 ## Compile errors

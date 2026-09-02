@@ -8,5 +8,5 @@
 Validate:
 
 ```bash
-authoring validate samples/catalog/dash.catalog
+authoring validate samples/catalog/dash.catalog.gdl
 ```

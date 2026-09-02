@@ -27,12 +27,12 @@ static int PrintUsage()
 {
     Console.WriteLine(
         """
-        authoring — federation .catalog toolchain
+        authoring — federation GDL catalog toolchain
 
         Usage:
-          authoring validate <file.catalog> [--workspace <root>]
-          authoring summary <file.catalog> [--workspace <root>]
-          authoring emit <file.catalog> [--workspace <root>] [--namespace N] [--class C]
+          authoring validate <file.catalog.gdl> [--workspace <root>]
+          authoring summary <file.catalog.gdl> [--workspace <root>]
+          authoring emit <file.catalog.gdl> [--workspace <root>] [--namespace N] [--class C]
           authoring --version
           authoring --help
         """);
