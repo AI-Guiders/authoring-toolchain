@@ -41,6 +41,40 @@ See [design/ATC-ADR-0001-toolchain-boundary.md](design/ATC-ADR-0001-toolchain-bo
 | `docs/learn/` | Progressive labs for humans |
 | `samples/catalog/` | Golden `.catalog` snippets |
 | `samples/deck/` | Golden `.deck` snippets |
+| `build/Platform.Gdl.Emit.*` | MSBuild targets: GDL emit → `Generated/*.g.cs` |
+| `samples/GdlEmit.Catalog.Sample/` | Sample `*.csproj` wiring for catalog emit |
+
+## GDL emit (MSBuild)
+
+Planet `*.csproj` files invoke per-quarry emit before compile (or fail CI when `Generated/*.g.cs` is stale). SSOT targets live in `build/Platform.Gdl.Emit.*` (packaged as `Authoring.Toolchain.Build`):
+
+```xml
+<Import Project="path/to/authoring-toolchain/build/Platform.Gdl.Emit.props" />
+
+<PropertyGroup>
+  <GdlEmitInput>authoring/planet.catalog.gdl</GdlEmitInput>
+  <GdlEmitKind>catalog</GdlEmitKind>
+  <GdlEmitNamespace>Planet.Generated</GdlEmitNamespace>
+  <GdlEmitClass>PlanetCatalog</GdlEmitClass>
+  <GdlEmitOutputDir>$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
+</PropertyGroup>
+```
+
+| Property | Role |
+|----------|------|
+| `GdlEmitInput` | `*.catalog.gdl` or `*.deck.gdl` source |
+| `GdlEmitKind` | `catalog` (`authoring emit`) or `deck` (`deck emit`) |
+| `GdlEmitNamespace` / `GdlEmitClass` | Passed to emit CLI |
+| `GdlEmitOutputDir` | Output folder (default `Generated/`) |
+| `GdlEmitForce` | `true` to re-emit regardless of timestamps |
+
+`BeforeCompile` runs emit when the input is newer than `$(GdlEmitOutputDir)/$(GdlEmitClass).g.cs`. CI stale check:
+
+```powershell
+dotnet msbuild Planet.csproj -p:Configuration=Release -t:GdlEmitVerify
+```
+
+Deck wiring: same properties with `GdlEmitKind=deck` and `GdlEmitDeckTool` / `GdlEmitDeckCommand` pointing at [AIGuiders.DotnetTools.DeckEmit](https://github.com/AI-Guiders/guiders-assist).
 
 ## `gdlc` (wave-1 stub)
 
