@@ -16,7 +16,7 @@ return args[0] switch
 
 static int PrintVersion()
 {
-    Console.WriteLine("gdlc 0.1.0-wave1");
+    Console.WriteLine("gdlc 0.2.0-wave2");
     return 0;
 }
 
@@ -24,13 +24,14 @@ static int PrintUsage()
 {
     Console.WriteLine(
         """
-        gdlc — unified GDL declare-time front-end (wave-1 stub; GUIDERS-ADR-0059 §10)
+        gdlc — unified GDL declare-time front-end (GUIDERS-ADR-0059 §10)
 
-        Today this routes single-file emit to existing per-quarry tools. Full pipeline
-        (--project *.gdlproj, validate, sat) is not implemented yet.
+        Routes single-file or project emit to existing per-quarry stacks.
+        validate / sat are not implemented yet.
 
         Usage:
           gdlc emit --lang=cs <file.{quarry}.gdl> [--namespace N] [--class C] [--out path]
+          gdlc emit --lang=cs --project <file.gdlproj> [--out dir]
           gdlc emit --lang=cs <file.catalog.gdl> [--workspace <root>]
           gdlc --version
           gdlc --help
@@ -42,6 +43,7 @@ static int PrintUsage()
         Examples:
           gdlc emit --lang=cs samples/catalog/dash.catalog.gdl --namespace Dash.Generated --class DashCatalog
           gdlc emit --lang=cs samples/deck/dashspec-studio.deck.gdl --namespace Dash.Generated --out Generated/DeckIds.g.cs
+          gdlc emit --lang=cs --project samples/planet/planet.gdlproj --out Generated
         """);
 
     return 0;

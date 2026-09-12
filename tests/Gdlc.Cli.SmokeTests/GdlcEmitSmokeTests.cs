@@ -50,6 +50,29 @@ public sealed class GdlcEmitSmokeTests
         Assert.Equal(2, exit);
     }
 
+    [Fact]
+    public void Emit_project_gdlproj_writes_csharp()
+    {
+        var project = ResolveRepoPath("samples", "planet", "planet.gdlproj");
+        var outputDir = Path.Combine(Path.GetTempPath(), $"gdlc-project-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(outputDir);
+
+        var exit = EmitCommand.Run(
+        [
+            "--lang=cs",
+            "--project",
+            project,
+            "--out",
+            outputDir,
+            "--namespace",
+            "Smoke.Generated",
+        ]);
+
+        Assert.Equal(0, exit);
+        Assert.True(File.Exists(Path.Combine(outputDir, "DashCatalog.g.cs")));
+        Assert.True(File.Exists(Path.Combine(outputDir, "DashspecStudioDeckIds.g.cs")));
+    }
+
     private static string ResolveRepoPath(params string[] parts)
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);

@@ -2,7 +2,9 @@ namespace Gdlc.Cli;
 
 internal sealed class EmitOptions
 {
-    public required string Path { get; init; }
+    public string? Path { get; init; }
+
+    public string? ProjectPath { get; init; }
 
     public string Lang { get; init; } = "cs";
 
@@ -21,6 +23,7 @@ internal sealed class EmitOptions
 
         var lang = "cs";
         string? path = null;
+        string? projectPath = null;
         string? workspaceRoot = null;
         var namespaceName = "Generated";
         var className = "Generated";
@@ -39,6 +42,9 @@ internal sealed class EmitOptions
             {
                 case "--lang" when i + 1 < args.Length:
                     lang = args[++i];
+                    break;
+                case "--project" when i + 1 < args.Length:
+                    projectPath = args[++i];
                     break;
                 case "--workspace" or "-w" when i + 1 < args.Length:
                     workspaceRoot = args[++i];
@@ -70,21 +76,28 @@ internal sealed class EmitOptions
             }
         }
 
-        if (string.IsNullOrWhiteSpace(path))
+        if (projectPath is not null && path is not null)
         {
-            error = "emit: missing file path";
+            error = "emit: use either --project or a single file path, not both";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(projectPath) && string.IsNullOrWhiteSpace(path))
+        {
+            error = "emit: missing file path or --project";
             return false;
         }
 
         if (!string.Equals(lang, "cs", StringComparison.OrdinalIgnoreCase))
         {
-            error = $"emit: unsupported --lang `{lang}` (wave-1 supports cs only)";
+            error = $"emit: unsupported --lang `{lang}` (wave-2 supports cs only)";
             return false;
         }
 
         options = new EmitOptions
         {
-            Path = System.IO.Path.GetFullPath(path),
+            Path = path is null ? null : System.IO.Path.GetFullPath(path),
+            ProjectPath = projectPath is null ? null : System.IO.Path.GetFullPath(projectPath),
             Lang = lang,
             WorkspaceRoot = workspaceRoot,
             Namespace = namespaceName,

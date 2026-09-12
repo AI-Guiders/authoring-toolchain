@@ -17,5 +17,6 @@
   <ItemGroup>
     <None Include="..\..\samples\catalog\dash.catalog.gdl" Link="samples/catalog/dash.catalog.gdl" />
     <None Include="..\..\samples\deck\dashspec-studio.deck.gdl" Link="samples/deck/dashspec-studio.deck.gdl" />
+    <None Include="..\..\samples\planet\planet.gdlproj" Link="samples/planet/planet.gdlproj" />
   </ItemGroup>
 </Project>

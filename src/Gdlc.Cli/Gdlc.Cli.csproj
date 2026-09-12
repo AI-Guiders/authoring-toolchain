@@ -5,7 +5,7 @@
     <AssemblyName>gdlc</AssemblyName>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>gdlc</ToolCommandName>
-    <Description>Wave-1 stub unified GDL front-end (GUIDERS-ADR-0059 §10).</Description>
+    <Description>Unified GDL front-end with single-file and gdlproj emit (GUIDERS-ADR-0059 §10).</Description>
     <GuidersPlatformRoot Condition="'$(GuidersPlatformRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\guiders-platform</GuidersPlatformRoot>
     <GuidersWpfRoot Condition="'$(GuidersWpfRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\guiders-wpf</GuidersWpfRoot>
   </PropertyGroup>

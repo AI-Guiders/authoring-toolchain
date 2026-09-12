@@ -17,17 +17,73 @@ internal static class EmitCommand
             return 2;
         }
 
-        if (!File.Exists(options!.Path))
+        if (options!.ProjectPath is not null)
+        {
+            return EmitProject(options);
+        }
+
+        if (!File.Exists(options.Path))
         {
             Console.Error.WriteLine($"emit: file not found: {options.Path}");
             return 1;
         }
 
-        return QuarryRouter.Resolve(options.Path) switch
+        return EmitSingleFile(options);
+    }
+
+    private static int EmitProject(EmitOptions options)
+    {
+        if (!File.Exists(options.ProjectPath))
+        {
+            Console.Error.WriteLine($"emit: project not found: {options.ProjectPath}");
+            return 1;
+        }
+
+        var load = GdlprojLoader.Open(options.ProjectPath);
+        if (load.Project is null)
+        {
+            WriteDiagnostics(load.Diagnostics);
+            return 1;
+        }
+
+        var exitCode = 0;
+        foreach (var document in load.Project.Documents)
+        {
+            if (string.IsNullOrWhiteSpace(document.DisplayPath))
+            {
+                continue;
+            }
+
+            var documentOptions = new EmitOptions
+            {
+                Path = document.DisplayPath,
+                Lang = options.Lang,
+                WorkspaceRoot = load.Project.WorkspaceRoot,
+                Namespace = options.Namespace,
+                ClassName = EmitOutputNaming.DefaultClassName(document.DisplayPath),
+                OutputPath = EmitOutputNaming.ResolveProjectOutputPath(
+                    load.Project.WorkspaceRoot,
+                    options.OutputPath,
+                    document.DisplayPath),
+            };
+
+            var result = EmitSingleFile(documentOptions);
+            if (result != 0)
+            {
+                exitCode = result;
+            }
+        }
+
+        return exitCode;
+    }
+
+    private static int EmitSingleFile(EmitOptions options)
+    {
+        return QuarryRouter.Resolve(options.Path!) switch
         {
             QuarryKind.Catalog => EmitCatalog(options),
             QuarryKind.Deck => EmitDeck(options),
-            _ => UnsupportedQuarry(options.Path),
+            _ => UnsupportedQuarry(options.Path!),
         };
     }
 
@@ -40,8 +96,8 @@ internal static class EmitCommand
     private static int EmitCatalog(EmitOptions options)
     {
         var result = CatalogProject.Open(
-            ResolveWorkspaceRoot(options.Path, options.WorkspaceRoot),
-            options.Path,
+            ResolveWorkspaceRoot(options.Path!, options.WorkspaceRoot),
+            options.Path!,
             CatalogBundleLibrary.Federation);
 
         if (result.Document is null)
@@ -57,7 +113,7 @@ internal static class EmitCommand
 
     private static int EmitDeck(EmitOptions options)
     {
-        var result = DeckParser.ParseFile(options.Path);
+        var result = DeckParser.ParseFile(options.Path!);
         if (result.Document is null)
         {
             foreach (var diagnostic in result.Diagnostics)

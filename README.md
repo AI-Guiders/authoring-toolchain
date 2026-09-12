@@ -41,6 +41,7 @@ See [design/ATC-ADR-0001-toolchain-boundary.md](design/ATC-ADR-0001-toolchain-bo
 | `docs/learn/` | Progressive labs for humans |
 | `samples/catalog/` | Golden `.catalog` snippets |
 | `samples/deck/` | Golden `.deck` snippets |
+| `samples/planet/` | Sample `*.gdlproj` declare entry |
 | `build/Platform.Gdl.Emit.*` | MSBuild targets: GDL emit → `Generated/*.g.cs` |
 | `samples/GdlEmit.Catalog.Sample/` | Sample `*.csproj` wiring for catalog emit |
 
@@ -76,13 +77,14 @@ dotnet msbuild Planet.csproj -p:Configuration=Release -t:GdlEmitVerify
 
 Deck wiring: same properties with `GdlEmitKind=deck` and `GdlEmitDeckTool` / `GdlEmitDeckCommand` pointing at [AIGuiders.DotnetTools.DeckEmit](https://github.com/AI-Guiders/guiders-assist).
 
-## `gdlc` (wave-1 stub)
+## `gdlc`
 
-Unified declare-time front-end per [GUIDERS-ADR-0059 §10](https://github.com/AI-Guiders/guiders-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md#10-compiler-pipeline-gdlc). Wave 1 routes single-file `emit` to existing per-quarry stacks; `*.gdlproj` / `validate` / `sat` come later.
+Unified declare-time front-end per [GUIDERS-ADR-0059 §10](https://github.com/AI-Guiders/guiders-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md#10-compiler-pipeline-gdlc). Routes single-file or `*.gdlproj` project `emit` to existing per-quarry stacks; `validate` / `sat` come later.
 
 ```powershell
 dotnet tool run --project src/Gdlc.Cli gdlc emit --lang=cs samples/catalog/dash.catalog.gdl --namespace Dash.Generated --class DashCatalog
 dotnet tool run --project src/Gdlc.Cli gdlc emit --lang=cs samples/deck/dashspec-studio.deck.gdl --namespace Dash.Generated --out Generated/DeckIds.g.cs
+dotnet tool run --project src/Gdlc.Cli gdlc emit --lang=cs --project samples/planet/planet.gdlproj --out Generated
 dotnet tool run --project src/Gdlc.Cli gdlc --help
 ```
 
@@ -90,6 +92,20 @@ dotnet tool run --project src/Gdlc.Cli gdlc --help
 |--------|----------------|
 | `*.catalog.gdl` | `authoring emit` stack (catalog codegen) |
 | `*.deck.gdl` | `deck emit` stack (deck codegen) |
+
+### `*.gdlproj` (wave 2)
+
+Minimal declare entry mapped to `AuthoringProject` ([GUIDERS-ADR-0051](https://github.com/AI-Guiders/guiders-platform/blob/main/docs/adr/GUIDERS-ADR-0051-authoring-project-abstraction.md)). `document` paths are relative to the `.gdlproj` directory; workspace root is the common ancestor of the project file and all listed documents.
+
+```text
+# samples/planet/planet.gdlproj
+project planet
+
+document ../catalog/dash.catalog.gdl
+document ../deck/dashspec-studio.deck.gdl
+```
+
+`gdlc emit --project` iterates listed documents and writes `*.g.cs` under `--out` (default: `<gdlproj-dir>/Generated/`). Class names derive from the document stem (`dash.catalog.gdl` → `DashCatalog`, `dashspec-studio.deck.gdl` → `DashspecStudioDeckIds`).
 
 Manual smoke (after `dotnet build`):
 
