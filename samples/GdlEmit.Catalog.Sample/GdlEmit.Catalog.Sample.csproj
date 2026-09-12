@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>GdlEmit.Catalog.Sample</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <Description>Sample consumer of Platform.Gdl.Emit targets (catalog path).</Description>
+  </PropertyGroup>
+
+  <Import Project="..\..\build\Platform.Gdl.Emit.props" />
+
+  <PropertyGroup>
+    <AuthoringToolchainRoot>$(MSBuildThisFileDirectory)..\..\</AuthoringToolchainRoot>
+    <GuidersPlatformRoot>$(MSBuildThisFileDirectory)..\..\..\guiders-platform\</GuidersPlatformRoot>
+    <GdlEmitInput>$(MSBuildThisFileDirectory)..\catalog\dash.catalog.gdl</GdlEmitInput>
+    <GdlEmitKind>catalog</GdlEmitKind>
+    <GdlEmitNamespace>DashSpec.Generated</GdlEmitNamespace>
+    <GdlEmitClass>DashCatalog</GdlEmitClass>
+    <GdlEmitOutputDir>$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
+    <GdlEmitWorkspace>$(AuthoringToolchainRoot)</GdlEmitWorkspace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen" />
+    <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen.csproj" />
+  </ItemGroup>
+
+</Project>

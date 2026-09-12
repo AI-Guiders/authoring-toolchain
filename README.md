@@ -40,6 +40,28 @@ See [design/ATC-ADR-0001-toolchain-boundary.md](design/ATC-ADR-0001-toolchain-bo
 | `conformance/` | Grammar vector runner (CI) |
 | `docs/learn/` | Progressive labs for humans |
 | `samples/catalog/` | Golden `.catalog` snippets |
+| `samples/deck/` | Golden `.deck` snippets |
+
+## `gdlc` (wave-1 stub)
+
+Unified declare-time front-end per [GUIDERS-ADR-0059 §10](https://github.com/AI-Guiders/guiders-platform/blob/main/docs/adr/GUIDERS-ADR-0059-gdl-hyperlane.md#10-compiler-pipeline-gdlc). Wave 1 routes single-file `emit` to existing per-quarry stacks; `*.gdlproj` / `validate` / `sat` come later.
+
+```powershell
+dotnet tool run --project src/Gdlc.Cli gdlc emit --lang=cs samples/catalog/dash.catalog.gdl --namespace Dash.Generated --class DashCatalog
+dotnet tool run --project src/Gdlc.Cli gdlc emit --lang=cs samples/deck/dashspec-studio.deck.gdl --namespace Dash.Generated --out Generated/DeckIds.g.cs
+dotnet tool run --project src/Gdlc.Cli gdlc --help
+```
+
+| Suffix | Delegates to |
+|--------|----------------|
+| `*.catalog.gdl` | `authoring emit` stack (catalog codegen) |
+| `*.deck.gdl` | `deck emit` stack (deck codegen) |
+
+Manual smoke (after `dotnet build`):
+
+```powershell
+dotnet test tests/Gdlc.Cli.SmokeTests/Gdlc.Cli.SmokeTests.csproj -c Release
+```
 
 ## Build
 

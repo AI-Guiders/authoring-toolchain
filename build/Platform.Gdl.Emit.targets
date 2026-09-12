@@ -1,0 +1,124 @@
+<Project>
+  <!-- Federation GDL emit MSBuild integration: catalog (authoring emit) + deck (deck emit). -->
+
+  <PropertyGroup>
+    <GdlEmitEnabled Condition="'$(GdlEmitEnabled)' == ''">true</GdlEmitEnabled>
+    <GdlEmitForce Condition="'$(GdlEmitForce)' == ''">false</GdlEmitForce>
+    <_GdlEmitVerifyDir>$(IntermediateOutputPath)gdl-emit-verify\</_GdlEmitVerifyDir>
+    <_GdlEmitVerifyOutput>$(_GdlEmitVerifyDir)$(GdlEmitClass).g.cs</_GdlEmitVerifyOutput>
+    <_GdlEmitWorkspaceArg Condition="'$(GdlEmitWorkspace)' != ''">--workspace &quot;$(GdlEmitWorkspace)&quot;</_GdlEmitWorkspaceArg>
+    <_GdlEmitWorkspaceArg Condition="'$(GdlEmitWorkspace)' == ''"></_GdlEmitWorkspaceArg>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <None Include="$(GdlEmitInput)" />
+  </ItemGroup>
+
+  <Target Name="GdlEmitPrepare"
+          BeforeTargets="GdlEmitResolveTools;GdlEmit;GdlEmitVerify"
+          Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <PropertyGroup>
+      <GdlEmitOutputDir Condition="'$(GdlEmitOutputDir)' == ''">$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
+      <GdlEmitNamespace Condition="'$(GdlEmitNamespace)' == '' and '$(GdlEmitKind)' == 'catalog'">Generated.Catalog</GdlEmitNamespace>
+      <GdlEmitNamespace Condition="'$(GdlEmitNamespace)' == '' and '$(GdlEmitKind)' == 'deck'">Generated.Deck</GdlEmitNamespace>
+      <GdlEmitClass Condition="'$(GdlEmitClass)' == '' and '$(GdlEmitKind)' == 'catalog'">PlanetCatalog</GdlEmitClass>
+      <GdlEmitClass Condition="'$(GdlEmitClass)' == '' and '$(GdlEmitKind)' == 'deck'">DeckIds</GdlEmitClass>
+      <GdlEmitOutput Condition="'$(GdlEmitOutput)' == ''">$(GdlEmitOutputDir)\$(GdlEmitClass).g.cs</GdlEmitOutput>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="GdlEmitResolveTools"
+          DependsOnTargets="GdlEmitPrepare"
+          Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <Error Text="GdlEmitKind is required (catalog|deck) when GdlEmitInput is set."
+           Condition="'$(GdlEmitKind)' == ''" />
+    <Error Text="GdlEmitKind must be 'catalog' or 'deck'; got '$(GdlEmitKind)'."
+           Condition="'$(GdlEmitKind)' != 'catalog' and '$(GdlEmitKind)' != 'deck'" />
+    <Error Text="GdlEmit input not found: $(GdlEmitInput)"
+           Condition="!Exists('$(GdlEmitInput)')" />
+
+    <Error Text="Set GdlEmitAuthoringTool (authoring.dll) or GdlEmitAuthoringCommand, or build Authoring.Cli in authoring-toolchain."
+           Condition="'$(GdlEmitKind)' == 'catalog' and '$(GdlEmitAuthoringCommand)' == '' and ('$(GdlEmitAuthoringTool)' == '' or !Exists('$(GdlEmitAuthoringTool)'))" />
+    <Error Text="Set GdlEmitDeckTool (DeckEmit.dll) or GdlEmitDeckCommand, or build AIGuiders.DotnetTools.DeckEmit in guiders-assist."
+           Condition="'$(GdlEmitKind)' == 'deck' and '$(GdlEmitDeckCommand)' == '' and ('$(GdlEmitDeckTool)' == '' or !Exists('$(GdlEmitDeckTool)'))" />
+  </Target>
+
+  <Target Name="GdlEmitBuildAuthoringTool"
+          BeforeTargets="GdlEmit"
+          Condition="'$(GdlEmitKind)' == 'catalog' and '$(GdlEmitAuthoringCommand)' == '' and '$(GdlEmitBuildTools)' != 'false' and '$(AuthoringToolchainRoot)' != '' and Exists('$(AuthoringToolchainRoot)src\Authoring.Cli\Authoring.Cli.csproj') and ('$(GdlEmitAuthoringTool)' == '' or !Exists('$(GdlEmitAuthoringTool)'))">
+    <MSBuild Projects="$(AuthoringToolchainRoot)src\Authoring.Cli\Authoring.Cli.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <PropertyGroup>
+      <GdlEmitAuthoringTool>$(AuthoringToolchainRoot)src\Authoring.Cli\bin\$(Configuration)\net10.0\authoring.dll</GdlEmitAuthoringTool>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="GdlEmitBuildDeckTool"
+          BeforeTargets="GdlEmit"
+          Condition="'$(GdlEmitKind)' == 'deck' and '$(GdlEmitDeckCommand)' == '' and '$(GdlEmitBuildTools)' != 'false' and '$(GuidersAssistRoot)' != '' and Exists('$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\AIGuiders.DotnetTools.DeckEmit.csproj') and ('$(GdlEmitDeckTool)' == '' or !Exists('$(GdlEmitDeckTool)'))">
+    <MSBuild Projects="$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\AIGuiders.DotnetTools.DeckEmit.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <PropertyGroup>
+      <GdlEmitDeckTool>$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\bin\$(Configuration)\net10.0\AIGuiders.DotnetTools.DeckEmit.dll</GdlEmitDeckTool>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="GdlEmit"
+          BeforeTargets="BeforeCompile"
+          DependsOnTargets="GdlEmitResolveTools;GdlEmitBuildAuthoringTool;GdlEmitBuildDeckTool"
+          Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <PropertyGroup>
+      <_GdlEmitNeedsRun Condition="'$(GdlEmitForce)' == 'true'">true</_GdlEmitNeedsRun>
+      <_GdlEmitNeedsRun Condition="'$(_GdlEmitNeedsRun)' == '' and !Exists('$(GdlEmitOutput)')">true</_GdlEmitNeedsRun>
+      <_GdlEmitNeedsRun Condition="'$(_GdlEmitNeedsRun)' == '' and Exists('$(GdlEmitInput)') and Exists('$(GdlEmitOutput)') and $([System.IO.File]::GetLastWriteTime('$(GdlEmitInput)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(GdlEmitOutput)').Ticks)">true</_GdlEmitNeedsRun>
+      <_GdlEmitCatalogCommand Condition="'$(GdlEmitAuthoringCommand)' != ''">$(GdlEmitAuthoringCommand) emit &quot;$(GdlEmitInput)&quot; $(_GdlEmitWorkspaceArg) --namespace $(GdlEmitNamespace) --class $(GdlEmitClass)</_GdlEmitCatalogCommand>
+      <_GdlEmitCatalogCommand Condition="'$(GdlEmitAuthoringCommand)' == ''">dotnet exec &quot;$(GdlEmitAuthoringTool)&quot; emit &quot;$(GdlEmitInput)&quot; $(_GdlEmitWorkspaceArg) --namespace $(GdlEmitNamespace) --class $(GdlEmitClass)</_GdlEmitCatalogCommand>
+      <_GdlEmitDeckCommand Condition="'$(GdlEmitDeckCommand)' != ''">$(GdlEmitDeckCommand) emit &quot;$(GdlEmitInput)&quot; --namespace $(GdlEmitNamespace) --class $(GdlEmitClass) --output &quot;$(GdlEmitOutput)&quot;</_GdlEmitDeckCommand>
+      <_GdlEmitDeckCommand Condition="'$(GdlEmitDeckCommand)' == ''">dotnet exec &quot;$(GdlEmitDeckTool)&quot; emit &quot;$(GdlEmitInput)&quot; --namespace $(GdlEmitNamespace) --class $(GdlEmitClass) --output &quot;$(GdlEmitOutput)&quot;</_GdlEmitDeckCommand>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(GdlEmitOutputDir)" Condition="'$(_GdlEmitNeedsRun)' == 'true'" />
+
+    <Exec Command="$(_GdlEmitCatalogCommand) &gt; &quot;$(GdlEmitOutput)&quot;"
+          Condition="'$(_GdlEmitNeedsRun)' == 'true' and '$(GdlEmitKind)' == 'catalog'" />
+    <Exec Command="$(_GdlEmitDeckCommand)"
+          Condition="'$(_GdlEmitNeedsRun)' == 'true' and '$(GdlEmitKind)' == 'deck'" />
+
+    <ItemGroup Condition="'$(_GdlEmitNeedsRun)' == 'true'">
+      <FileWrites Include="$(GdlEmitOutput)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GdlEmitVerify"
+          DependsOnTargets="GdlEmitResolveTools;GdlEmitBuildAuthoringTool;GdlEmitBuildDeckTool"
+          Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <Error Text="Generated file missing: $(GdlEmitOutput). Run dotnet build first."
+           Condition="!Exists('$(GdlEmitOutput)')" />
+
+    <MakeDir Directories="$(_GdlEmitVerifyDir)" />
+
+    <PropertyGroup>
+      <_GdlEmitVerifyCatalogCommand Condition="'$(GdlEmitAuthoringCommand)' != ''">$(GdlEmitAuthoringCommand) emit &quot;$(GdlEmitInput)&quot; $(_GdlEmitWorkspaceArg) --namespace $(GdlEmitNamespace) --class $(GdlEmitClass)</_GdlEmitVerifyCatalogCommand>
+      <_GdlEmitVerifyCatalogCommand Condition="'$(GdlEmitAuthoringCommand)' == ''">dotnet exec &quot;$(GdlEmitAuthoringTool)&quot; emit &quot;$(GdlEmitInput)&quot; $(_GdlEmitWorkspaceArg) --namespace $(GdlEmitNamespace) --class $(GdlEmitClass)</_GdlEmitVerifyCatalogCommand>
+      <_GdlEmitVerifyDeckCommand Condition="'$(GdlEmitDeckCommand)' != ''">$(GdlEmitDeckCommand) emit &quot;$(GdlEmitInput)&quot; --namespace $(GdlEmitNamespace) --class $(GdlEmitClass) --output &quot;$(_GdlEmitVerifyOutput)&quot;</_GdlEmitVerifyDeckCommand>
+      <_GdlEmitVerifyDeckCommand Condition="'$(GdlEmitDeckCommand)' == ''">dotnet exec &quot;$(GdlEmitDeckTool)&quot; emit &quot;$(GdlEmitInput)&quot; --namespace $(GdlEmitNamespace) --class $(GdlEmitClass) --output &quot;$(_GdlEmitVerifyOutput)&quot;</_GdlEmitVerifyDeckCommand>
+      <_GdlEmitCompareCmd Condition="'$(OS)' == 'Windows_NT'">cmd /c fc /b &quot;$(GdlEmitOutput)&quot; &quot;$(_GdlEmitVerifyOutput)&quot; &gt;nul</_GdlEmitCompareCmd>
+      <_GdlEmitCompareCmd Condition="'$(OS)' != 'Windows_NT'">cmp -s &quot;$(GdlEmitOutput)&quot; &quot;$(_GdlEmitVerifyOutput)&quot;</_GdlEmitCompareCmd>
+    </PropertyGroup>
+
+    <Exec Command="$(_GdlEmitVerifyCatalogCommand) &gt; &quot;$(_GdlEmitVerifyOutput)&quot;"
+          Condition="'$(GdlEmitKind)' == 'catalog'" />
+    <Exec Command="$(_GdlEmitVerifyDeckCommand)"
+          Condition="'$(GdlEmitKind)' == 'deck'" />
+
+    <Exec Command="$(_GdlEmitCompareCmd)"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="_GdlEmitVerifyExitCode" />
+    </Exec>
+
+    <Error Text="GDL emit output is stale: $(GdlEmitOutput). Re-run emit (dotnet build -p:GdlEmitForce=true) and commit the generated file."
+           Condition="'$(_GdlEmitVerifyExitCode)' != '0'" />
+  </Target>
+</Project>

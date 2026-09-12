@@ -2,6 +2,14 @@
   <Folder Name="/src/">
     <Project Path="src/Authoring.Cli/Authoring.Cli.csproj" />
     <Project Path="src/Authoring.LanguageServer.Catalog/Authoring.LanguageServer.Catalog.csproj" />
+    <Project Path="src/Authoring.Toolchain.Build/Authoring.Toolchain.Build.csproj" />
     <Project Path="src/Authoring.Toolchain.Host/Authoring.Toolchain.Host.csproj" />
+    <Project Path="src/Gdlc.Cli/Gdlc.Cli.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/GdlEmit.Catalog.Sample/GdlEmit.Catalog.Sample.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Gdlc.Cli.SmokeTests/Gdlc.Cli.SmokeTests.csproj" />
   </Folder>
 </Solution>

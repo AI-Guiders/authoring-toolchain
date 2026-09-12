@@ -1,0 +1,4 @@
+<Project>
+  <!-- NuGet entry: import Platform.Gdl.Emit from the package build/ folder. -->
+  <Import Project="$(MSBuildThisFileDirectory)Platform.Gdl.Emit.props" />
+</Project>

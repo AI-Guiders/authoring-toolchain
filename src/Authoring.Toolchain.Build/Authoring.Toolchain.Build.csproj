@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Authoring.Toolchain.Build</RootNamespace>
+    <AssemblyName>Authoring.Toolchain.Build</AssemblyName>
+    <Description>MSBuild targets for federation GDL emit (catalog + deck) to Generated/*.g.cs.</Description>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <PackageId>Authoring.Toolchain.Build</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\build\Platform.Gdl.Emit.props" Pack="true" PackagePath="build\Platform.Gdl.Emit.props" />
+    <None Include="..\..\build\Platform.Gdl.Emit.targets" Pack="true" PackagePath="build\Platform.Gdl.Emit.targets" />
+    <None Include="..\..\build\Authoring.Toolchain.Build.props" Pack="true" PackagePath="build\Authoring.Toolchain.Build.props" />
+  </ItemGroup>
+
+</Project>
