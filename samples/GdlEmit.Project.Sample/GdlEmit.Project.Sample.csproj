@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>GdlEmit.Project.Sample</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <Description>Sample consumer of Platform.Gdl.Emit targets (gdlproj / gdlc path).</Description>
+  </PropertyGroup>
+
+  <Import Project="..\..\build\Platform.Gdl.Emit.props" />
+
+  <PropertyGroup>
+    <AuthoringToolchainRoot>$(MSBuildThisFileDirectory)..\..\</AuthoringToolchainRoot>
+    <GuidersPlatformRoot>$(MSBuildThisFileDirectory)..\..\..\guiders-platform\</GuidersPlatformRoot>
+    <GuidersWpfRoot>$(MSBuildThisFileDirectory)..\..\..\guiders-wpf\</GuidersWpfRoot>
+    <GdlEmitProject>$(MSBuildThisFileDirectory)..\planet\planet.gdlproj</GdlEmitProject>
+    <GdlEmitOutputDir>$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
+    <GdlEmitNamespace>Planet.Generated</GdlEmitNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="AIGuiders.Platform.Authoring.Command.Catalog" />
+    <Using Include="AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen" />
+    <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />
+    <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen.csproj" />
+    <ProjectReference Include="$(GuidersWpfRoot)src\AIGuiders.Surface.Wpf.CodeGen\AIGuiders.Surface.Wpf.CodeGen.csproj" />
+  </ItemGroup>
+
+</Project>

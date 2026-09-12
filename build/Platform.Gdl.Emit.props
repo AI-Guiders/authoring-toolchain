@@ -10,5 +10,6 @@
 
     <GdlEmitAuthoringTool Condition="'$(GdlEmitAuthoringTool)' == '' and '$(AuthoringToolchainRoot)' != '' and Exists('$(AuthoringToolchainRoot)src\Authoring.Cli\bin\$(Configuration)\net10.0\authoring.dll')">$(AuthoringToolchainRoot)src\Authoring.Cli\bin\$(Configuration)\net10.0\authoring.dll</GdlEmitAuthoringTool>
     <GdlEmitDeckTool Condition="'$(GdlEmitDeckTool)' == '' and '$(GuidersAssistRoot)' != '' and Exists('$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\bin\$(Configuration)\net10.0\AIGuiders.DotnetTools.DeckEmit.dll')">$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\bin\$(Configuration)\net10.0\AIGuiders.DotnetTools.DeckEmit.dll</GdlEmitDeckTool>
+    <GdlEmitGdlcTool Condition="'$(GdlEmitGdlcTool)' == '' and '$(AuthoringToolchainRoot)' != '' and Exists('$(AuthoringToolchainRoot)src\Gdlc.Cli\bin\$(Configuration)\net10.0\gdlc.dll')">$(AuthoringToolchainRoot)src\Gdlc.Cli\bin\$(Configuration)\net10.0\gdlc.dll</GdlEmitGdlcTool>
   </PropertyGroup>
 </Project>

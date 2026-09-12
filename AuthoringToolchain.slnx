@@ -8,8 +8,10 @@
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/GdlEmit.Catalog.Sample/GdlEmit.Catalog.Sample.csproj" />
+    <Project Path="samples/GdlEmit.Project.Sample/GdlEmit.Project.Sample.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Gdlc.Cli.SmokeTests/Gdlc.Cli.SmokeTests.csproj" />
+    <Project Path="tests/GdlEmit.MsBuildTests/GdlEmit.MsBuildTests.csproj" />
   </Folder>
 </Solution>

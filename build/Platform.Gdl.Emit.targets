@@ -1,21 +1,28 @@
 <Project>
-  <!-- Federation GDL emit MSBuild integration: catalog (authoring emit) + deck (deck emit). -->
+  <!-- Federation GDL emit MSBuild integration: catalog (authoring emit) + deck (deck emit) + gdlproj (gdlc emit). -->
 
   <PropertyGroup>
     <GdlEmitEnabled Condition="'$(GdlEmitEnabled)' == ''">true</GdlEmitEnabled>
     <GdlEmitForce Condition="'$(GdlEmitForce)' == ''">false</GdlEmitForce>
-    <_GdlEmitVerifyDir>$(IntermediateOutputPath)gdl-emit-verify\</_GdlEmitVerifyDir>
+    <_GdlEmitVerifyDir>$(IntermediateOutputPath)gdl-emit-verify</_GdlEmitVerifyDir>
     <_GdlEmitVerifyOutput>$(_GdlEmitVerifyDir)$(GdlEmitClass).g.cs</_GdlEmitVerifyOutput>
     <_GdlEmitWorkspaceArg Condition="'$(GdlEmitWorkspace)' != ''">--workspace &quot;$(GdlEmitWorkspace)&quot;</_GdlEmitWorkspaceArg>
     <_GdlEmitWorkspaceArg Condition="'$(GdlEmitWorkspace)' == ''"></_GdlEmitWorkspaceArg>
   </PropertyGroup>
+
+  <Target Name="GdlEmitValidateMode"
+          BeforeTargets="GdlEmitPrepare;GdlEmitProjectPrepare"
+          Condition="'$(GdlEmitEnabled)' == 'true'">
+    <Error Text="GdlEmitInput and GdlEmitProject are mutually exclusive; set one or the other."
+           Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitProject)' != ''" />
+  </Target>
 
   <ItemGroup Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
     <None Include="$(GdlEmitInput)" />
   </ItemGroup>
 
   <Target Name="GdlEmitPrepare"
-          BeforeTargets="GdlEmitResolveTools;GdlEmit;GdlEmitVerify"
+          BeforeTargets="GdlEmitResolveTools;GdlEmit;GdlEmitVerifyInput"
           Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
     <PropertyGroup>
       <GdlEmitOutputDir Condition="'$(GdlEmitOutputDir)' == ''">$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
@@ -91,7 +98,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="GdlEmitVerify"
+  <Target Name="GdlEmitVerifyInput"
           DependsOnTargets="GdlEmitResolveTools;GdlEmitBuildAuthoringTool;GdlEmitBuildDeckTool"
           Condition="'$(GdlEmitInput)' != '' and '$(GdlEmitEnabled)' == 'true'">
     <Error Text="Generated file missing: $(GdlEmitOutput). Run dotnet build first."
@@ -121,4 +128,125 @@
     <Error Text="GDL emit output is stale: $(GdlEmitOutput). Re-run emit (dotnet build -p:GdlEmitForce=true) and commit the generated file."
            Condition="'$(_GdlEmitVerifyExitCode)' != '0'" />
   </Target>
+
+  <!-- gdlproj project emit (gdlc) -->
+
+  <Target Name="GdlEmitProjectPrepare"
+          BeforeTargets="GdlEmitProjectResolveTools;GdlEmitProject;GdlEmitVerifyProject"
+          Condition="'$(GdlEmitProject)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <PropertyGroup>
+      <GdlEmitOutputDir Condition="'$(GdlEmitOutputDir)' == ''">$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
+      <GdlEmitLang Condition="'$(GdlEmitLang)' == ''">cs</GdlEmitLang>
+      <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">obj\$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+      <_GdlEmitProjectDir>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetFullPath('$(GdlEmitProject)'))))</_GdlEmitProjectDir>
+      <_GdlEmitProjectStamp>$(IntermediateOutputPath)gdl-emit.stamp</_GdlEmitProjectStamp>
+      <_GdlEmitNamespaceArg Condition="'$(GdlEmitNamespace)' != ''">--namespace $(GdlEmitNamespace)</_GdlEmitNamespaceArg>
+      <_GdlEmitNamespaceArg Condition="'$(GdlEmitNamespace)' == ''"></_GdlEmitNamespaceArg>
+    </PropertyGroup>
+
+    <ReadLinesFromFile File="$(GdlEmitProject)">
+      <Output TaskParameter="Lines" ItemName="_GdlprojLine" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <_GdlEmitProjectDocumentRelative Include="$([System.String]::Copy('%(_GdlprojLine.Identity)').Substring(9).Trim())"
+                                       Condition="$([System.String]::Copy('%(_GdlprojLine.Identity)').Trim().StartsWith('document '))" />
+      <_GdlEmitProjectInput Include="$(_GdlEmitProjectDir)\%(_GdlEmitProjectDocumentRelative.Identity)"
+                            Condition="'%(_GdlEmitProjectDocumentRelative.Identity)' != ''" />
+      <_GdlEmitProjectInput Include="$(GdlEmitProject)" />
+      <None Include="$(GdlEmitProject)" />
+      <None Include="@(_GdlEmitProjectInput)"
+            Condition="'%(Identity)' != '$(GdlEmitProject)'" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GdlEmitProjectResolveTools"
+          DependsOnTargets="GdlEmitProjectPrepare"
+          Condition="'$(GdlEmitProject)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <Error Text="GdlEmit project not found: $(GdlEmitProject)"
+           Condition="!Exists('$(GdlEmitProject)')" />
+    <Error Text="Document not found: %(_GdlEmitProjectInput.Identity)"
+           Condition="!Exists('%(_GdlEmitProjectInput.Identity)') and '%(Identity)' != '$(GdlEmitProject)'" />
+    <Error Text="Set GdlEmitGdlcTool (gdlc.dll) or GdlEmitGdlcCommand, or build Gdlc.Cli in authoring-toolchain."
+           Condition="'$(GdlEmitGdlcCommand)' == '' and ('$(GdlEmitGdlcTool)' == '' or !Exists('$(GdlEmitGdlcTool)'))" />
+  </Target>
+
+  <Target Name="GdlEmitBuildGdlcTool"
+          BeforeTargets="GdlEmitProject;GdlEmitVerifyProject"
+          Condition="'$(GdlEmitProject)' != '' and '$(GdlEmitGdlcCommand)' == '' and '$(GdlEmitBuildTools)' != 'false' and '$(AuthoringToolchainRoot)' != '' and Exists('$(AuthoringToolchainRoot)src\Gdlc.Cli\Gdlc.Cli.csproj') and ('$(GdlEmitGdlcTool)' == '' or !Exists('$(GdlEmitGdlcTool)'))">
+    <MSBuild Projects="$(AuthoringToolchainRoot)src\Gdlc.Cli\Gdlc.Cli.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <PropertyGroup>
+      <GdlEmitGdlcTool>$(AuthoringToolchainRoot)src\Gdlc.Cli\bin\$(Configuration)\net10.0\gdlc.dll</GdlEmitGdlcTool>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="GdlEmitProject"
+          BeforeTargets="BeforeCompile"
+          DependsOnTargets="GdlEmitProjectResolveTools;GdlEmitBuildGdlcTool"
+          Inputs="$(GdlEmitProject);@(_GdlEmitProjectInput)"
+          Outputs="$(_GdlEmitProjectStamp)"
+          Condition="'$(GdlEmitProject)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <Delete Files="$(_GdlEmitProjectStamp)"
+            Condition="'$(GdlEmitForce)' == 'true' and Exists('$(_GdlEmitProjectStamp)')" />
+
+    <PropertyGroup>
+      <_GdlEmitProjectCommand Condition="'$(GdlEmitGdlcCommand)' != ''">$(GdlEmitGdlcCommand) emit --lang=$(GdlEmitLang) --project &quot;$(GdlEmitProject)&quot; --out &quot;$([System.String]::Copy('$(GdlEmitOutputDir)').TrimEnd('\'))&quot; $(_GdlEmitNamespaceArg)</_GdlEmitProjectCommand>
+      <_GdlEmitProjectCommand Condition="'$(GdlEmitGdlcCommand)' == ''">dotnet exec &quot;$(GdlEmitGdlcTool)&quot; emit --lang=$(GdlEmitLang) --project &quot;$(GdlEmitProject)&quot; --out &quot;$([System.String]::Copy('$(GdlEmitOutputDir)').TrimEnd('\'))&quot; $(_GdlEmitNamespaceArg)</_GdlEmitProjectCommand>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(GdlEmitOutputDir)" />
+
+    <Exec Command="$(_GdlEmitProjectCommand)" />
+
+    <Touch Files="$(_GdlEmitProjectStamp)"
+           AlwaysCreate="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(GdlEmitOutputDir)\*.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GdlEmitVerifyProject"
+          DependsOnTargets="GdlEmitProjectResolveTools;GdlEmitBuildGdlcTool"
+          Condition="'$(GdlEmitProject)' != '' and '$(GdlEmitEnabled)' == 'true'">
+    <PropertyGroup>
+      <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">obj\$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+      <_GdlEmitVerifyDir>$(IntermediateOutputPath)gdl-emit-verify</_GdlEmitVerifyDir>
+      <_GdlEmitVerifyDirFull>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\$(_GdlEmitVerifyDir)'))</_GdlEmitVerifyDirFull>
+      <_GdlEmitOutputDirFull>$([System.IO.Path]::GetFullPath('$([System.String]::Copy('$(GdlEmitOutputDir)').TrimEnd('\'))'))</_GdlEmitOutputDirFull>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_GdlEmitProjectOutput Include="$(GdlEmitOutputDir)\*.g.cs" />
+    </ItemGroup>
+
+    <Error Text="No generated outputs in $(GdlEmitOutputDir). Run dotnet build first."
+           Condition="@(_GdlEmitProjectOutput-&gt;Count()) == 0" />
+
+    <RemoveDir Directories="$(_GdlEmitVerifyDir)" />
+    <MakeDir Directories="$(_GdlEmitVerifyDir)" />
+
+    <PropertyGroup>
+      <_GdlEmitProjectVerifyCommand Condition="'$(GdlEmitGdlcCommand)' != ''">$(GdlEmitGdlcCommand) emit --lang=$(GdlEmitLang) --project &quot;$(GdlEmitProject)&quot; --out &quot;$(_GdlEmitVerifyDirFull)&quot; $(_GdlEmitNamespaceArg)</_GdlEmitProjectVerifyCommand>
+      <_GdlEmitProjectVerifyCommand Condition="'$(GdlEmitGdlcCommand)' == ''">dotnet exec &quot;$(GdlEmitGdlcTool)&quot; emit --lang=$(GdlEmitLang) --project &quot;$(GdlEmitProject)&quot; --out &quot;$(_GdlEmitVerifyDirFull)&quot; $(_GdlEmitNamespaceArg)</_GdlEmitProjectVerifyCommand>
+      <_GdlEmitCompareDirsCmd Condition="'$(OS)' == 'Windows_NT'">powershell -NoProfile -Command "$e=0; $expected = @(Get-ChildItem '$(_GdlEmitOutputDirFull)\*.g.cs'); $actual = @(Get-ChildItem '$(_GdlEmitVerifyDirFull)\*.g.cs'); if ($expected.Count -ne $actual.Count) { $e = 1 } else { foreach ($file in $expected) { $verify = Join-Path '$(_GdlEmitVerifyDirFull)' $file.Name; if (-not (Test-Path $verify) -or ((Get-Content -LiteralPath $file.FullName -Raw) -ne (Get-Content -LiteralPath $verify -Raw))) { $e = 1 } } }; exit $e"</_GdlEmitCompareDirsCmd>
+      <_GdlEmitCompareDirsCmd Condition="'$(OS)' != 'Windows_NT'">diff -qr &quot;$(_GdlEmitOutputDirFull)&quot; &quot;$(_GdlEmitVerifyDirFull)&quot;</_GdlEmitCompareDirsCmd>
+    </PropertyGroup>
+
+    <Exec Command="$(_GdlEmitProjectVerifyCommand)" />
+
+    <Exec Command="$(_GdlEmitCompareDirsCmd)"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="_GdlEmitVerifyExitCode" />
+    </Exec>
+
+    <Error Text="GDL project emit outputs are stale under $(GdlEmitOutputDir). Re-run emit (dotnet build -p:GdlEmitForce=true) and commit the generated files."
+           Condition="'$(_GdlEmitVerifyExitCode)' != '0'" />
+  </Target>
+
+  <Target Name="GdlEmitVerify"
+          DependsOnTargets="GdlEmitVerifyInput;GdlEmitVerifyProject"
+          Condition="'$(GdlEmitEnabled)' == 'true' and ('$(GdlEmitInput)' != '' or '$(GdlEmitProject)' != '')" />
 </Project>

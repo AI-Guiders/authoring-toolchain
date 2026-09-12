@@ -43,7 +43,8 @@ See [design/ATC-ADR-0001-toolchain-boundary.md](design/ATC-ADR-0001-toolchain-bo
 | `samples/deck/` | Golden `.deck` snippets |
 | `samples/planet/` | Sample `*.gdlproj` declare entry |
 | `build/Platform.Gdl.Emit.*` | MSBuild targets: GDL emit → `Generated/*.g.cs` |
-| `samples/GdlEmit.Catalog.Sample/` | Sample `*.csproj` wiring for catalog emit |
+| `samples/GdlEmit.Catalog.Sample/` | Sample `*.csproj` wiring for single-file catalog emit |
+| `samples/GdlEmit.Project.Sample/` | Sample `*.csproj` wiring for `*.gdlproj` emit via `gdlc` |
 
 ## GDL emit (MSBuild)
 
@@ -63,19 +64,38 @@ Planet `*.csproj` files invoke per-quarry emit before compile (or fail CI when `
 
 | Property | Role |
 |----------|------|
-| `GdlEmitInput` | `*.catalog.gdl` or `*.deck.gdl` source |
-| `GdlEmitKind` | `catalog` (`authoring emit`) or `deck` (`deck emit`) |
-| `GdlEmitNamespace` / `GdlEmitClass` | Passed to emit CLI |
+| `GdlEmitInput` | `*.catalog.gdl` or `*.deck.gdl` source (single-file path) |
+| `GdlEmitProject` | `*.gdlproj` declare entry; emits all listed `document` files via `gdlc` |
+| `GdlEmitKind` | `catalog` (`authoring emit`) or `deck` (`deck emit`); required with `GdlEmitInput` |
+| `GdlEmitNamespace` / `GdlEmitClass` | Passed to single-file emit CLI |
+| `GdlEmitLang` | Language for `gdlc` project emit (default `cs`) |
 | `GdlEmitOutputDir` | Output folder (default `Generated/`) |
 | `GdlEmitForce` | `true` to re-emit regardless of timestamps |
+| `GdlEmitGdlcTool` / `GdlEmitGdlcCommand` | Override `gdlc` resolution for project emit |
 
-`BeforeCompile` runs emit when the input is newer than `$(GdlEmitOutputDir)/$(GdlEmitClass).g.cs`. CI stale check:
+Set either `GdlEmitInput` or `GdlEmitProject`, not both.
+
+**Single-file** (`GdlEmitInput`): `BeforeCompile` runs per-quarry emit when the input is newer than `$(GdlEmitOutputDir)/$(GdlEmitClass).g.cs`.
+
+**Project** (`GdlEmitProject`, wave 2.5): `BeforeCompile` runs `gdlc emit --lang=cs --project $(GdlEmitProject) --out $(GdlEmitOutputDir)` when the gdlproj or any listed document is newer than the emit stamp.
+
+```xml
+<PropertyGroup>
+  <GdlEmitProject>authoring/planet.gdlproj</GdlEmitProject>
+  <GdlEmitOutputDir>$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
+  <GdlEmitNamespace>Planet.Generated</GdlEmitNamespace>
+</PropertyGroup>
+```
+
+CI stale check (both modes):
 
 ```powershell
 dotnet msbuild Planet.csproj -p:Configuration=Release -t:GdlEmitVerify
 ```
 
-Deck wiring: same properties with `GdlEmitKind=deck` and `GdlEmitDeckTool` / `GdlEmitDeckCommand` pointing at [AIGuiders.DotnetTools.DeckEmit](https://github.com/AI-Guiders/guiders-assist).
+Project-mode verify re-emits all outputs and compares every `Generated/*.g.cs` file.
+
+Deck wiring (single-file): same properties with `GdlEmitKind=deck` and `GdlEmitDeckTool` / `GdlEmitDeckCommand` pointing at [AIGuiders.DotnetTools.DeckEmit](https://github.com/AI-Guiders/guiders-assist).
 
 ## `gdlc`
 
