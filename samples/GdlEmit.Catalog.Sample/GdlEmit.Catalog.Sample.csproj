@@ -21,7 +21,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="AIGuiders.Platform.Authoring.Command.Catalog" />
     <Using Include="AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen" />
+    <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />
     <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen.csproj" />
   </ItemGroup>
 
