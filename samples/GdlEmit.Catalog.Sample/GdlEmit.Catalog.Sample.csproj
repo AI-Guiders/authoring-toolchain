@@ -13,7 +13,7 @@
     <AuthoringToolchainRoot>$(MSBuildThisFileDirectory)..\..\</AuthoringToolchainRoot>
     <GuidersPlatformRoot>$(MSBuildThisFileDirectory)..\..\..\guiders-platform\</GuidersPlatformRoot>
     <GdlEmitInput>$(MSBuildThisFileDirectory)..\catalog\dash.catalog.gdl</GdlEmitInput>
-    <GdlEmitKind>catalog</GdlEmitKind>
+    <GdlEmitLang>cs</GdlEmitLang>
     <GdlEmitNamespace>DashSpec.Generated</GdlEmitNamespace>
     <GdlEmitClass>DashCatalog</GdlEmitClass>
     <GdlEmitOutputDir>$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
@@ -21,6 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Gdlc.Cli\Gdlc.Cli.csproj" ReferenceOutputAssembly="false" />
     <Using Include="AIGuiders.Platform.Authoring.Command.Catalog" />
     <Using Include="AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen" />
     <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />

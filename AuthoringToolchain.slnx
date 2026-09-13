@@ -5,6 +5,7 @@
     <Project Path="src/Authoring.Toolchain.Build/Authoring.Toolchain.Build.csproj" />
     <Project Path="src/Authoring.Toolchain.Host/Authoring.Toolchain.Host.csproj" />
     <Project Path="src/Gdlc.Cli/Gdlc.Cli.csproj" />
+    <Project Path="src/Gdlc.Plugins.Federation/Gdlc.Plugins.Federation.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/GdlEmit.Catalog.Sample/GdlEmit.Catalog.Sample.csproj" />

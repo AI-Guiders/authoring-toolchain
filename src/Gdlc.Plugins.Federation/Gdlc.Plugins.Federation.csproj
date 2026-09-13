@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Gdlc.Plugins.Federation</RootNamespace>
+    <AssemblyName>Gdlc.Plugins.Federation</AssemblyName>
+    <Description>Built-in gdlc quarry plugin federation bootstrap (ATC-ADR-0002).</Description>
+    <GuidersPlatformRoot Condition="'$(GuidersPlatformRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\guiders-platform</GuidersPlatformRoot>
+    <GuidersWpfRoot Condition="'$(GuidersWpfRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\guiders-wpf</GuidersWpfRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(GuidersPlatformRoot)\src\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen\AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen.csproj" />
+    <ProjectReference Include="$(GuidersWpfRoot)\src\AIGuiders.Surface.Wpf.CodeGen\AIGuiders.Surface.Wpf.CodeGen.csproj" />
+  </ItemGroup>
+</Project>

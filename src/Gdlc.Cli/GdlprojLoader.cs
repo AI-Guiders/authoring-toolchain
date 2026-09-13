@@ -8,7 +8,7 @@ namespace Gdlc.Cli;
 /// </summary>
 internal static class GdlprojLoader
 {
-    public static AuthoringProjectLoadResult Open(string gdlprojPath)
+    public static GdlprojLoadResult Open(string gdlprojPath)
     {
         var diagnostics = new List<AuthoringDiagnostic>();
         var physical = Path.GetFullPath(gdlprojPath);
@@ -33,6 +33,8 @@ internal static class GdlprojLoader
 
         var projectDirectory = Path.GetDirectoryName(physical)!;
         var documentPaths = new List<string>();
+        var defaultLang = "cs";
+        string? defaultSurface = GdlSurfaceDefault.Wpf;
         var lineNo = 0;
 
         foreach (var rawLine in File.ReadLines(physical))
@@ -60,6 +62,24 @@ internal static class GdlprojLoader
                     break;
                 case "document":
                     documentPaths.Add(parts[1]);
+                    break;
+                case "emit" when parts.Length >= 3:
+                    switch (parts[1].ToLowerInvariant())
+                    {
+                        case "lang":
+                            defaultLang = parts[2];
+                            break;
+                        case "surface":
+                            defaultSurface = parts[2];
+                            break;
+                        default:
+                            diagnostics.Add(new(
+                                AuthoringDiagnosticCode.InvalidSyntax,
+                                $"gdlproj:{lineNo}: unknown emit directive `{parts[1]}`",
+                                lineNo));
+                            break;
+                    }
+
                     break;
                 default:
                     diagnostics.Add(new(
@@ -132,7 +152,13 @@ internal static class GdlprojLoader
         }
 
         var project = new AuthoringProject(workspaceRoot, entry.Value, documents);
-        return new() { Project = project, Diagnostics = diagnostics };
+        return new()
+        {
+            Project = project,
+            Diagnostics = diagnostics,
+            DefaultLang = defaultLang,
+            DefaultSurface = defaultSurface,
+        };
     }
 
     private static string ResolveWorkspaceRoot(string projectDirectory, IEnumerable<string> documentPaths)

@@ -25,9 +25,17 @@ internal static class QuarryRouter
         return QuarryKind.Unsupported;
     }
 
+    public static string? ResolveQuarryId(string path) =>
+        Resolve(path) switch
+        {
+            QuarryKind.Catalog => AIGuiders.Platform.Authoring.Emit.GdlQuarryIds.Catalog,
+            QuarryKind.Deck => AIGuiders.Platform.Authoring.Emit.GdlQuarryIds.Deck,
+            _ => null,
+        };
+
     public static string DescribeUnsupported(string path)
     {
         var fileName = Path.GetFileName(path);
-        return $"emit: unsupported quarry for `{fileName}` — expected *.(catalog|deck).gdl suffix";
+        return $"unsupported quarry for `{fileName}` — expected *.(catalog|deck).gdl suffix";
     }
 }

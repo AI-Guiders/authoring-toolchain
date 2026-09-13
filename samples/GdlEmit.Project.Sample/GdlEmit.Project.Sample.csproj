@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Gdlc.Cli\Gdlc.Cli.csproj" ReferenceOutputAssembly="false" />
     <Using Include="AIGuiders.Platform.Authoring.Command.Catalog" />
     <Using Include="AIGuiders.Platform.Execution.CommandPlane.Catalog.CodeGen" />
     <ProjectReference Include="$(GuidersPlatformRoot)src\AIGuiders.Platform.Authoring.Command.Catalog\AIGuiders.Platform.Authoring.Command.Catalog.csproj" />

@@ -1,15 +1,7 @@
 namespace Gdlc.Cli;
 
-internal sealed class EmitOptions
+internal sealed class EmitOptions : GdlCommandOptions
 {
-    public string? Path { get; init; }
-
-    public string? ProjectPath { get; init; }
-
-    public string Lang { get; init; } = "cs";
-
-    public string? WorkspaceRoot { get; init; }
-
     public string Namespace { get; init; } = "Generated";
 
     public string ClassName { get; init; } = "Generated";
@@ -22,6 +14,7 @@ internal sealed class EmitOptions
         error = null;
 
         var lang = "cs";
+        string? surface = null;
         string? path = null;
         string? projectPath = null;
         string? workspaceRoot = null;
@@ -38,10 +31,19 @@ internal sealed class EmitOptions
                 continue;
             }
 
+            if (arg.StartsWith("--surface=", StringComparison.Ordinal))
+            {
+                surface = arg["--surface=".Length..];
+                continue;
+            }
+
             switch (arg)
             {
                 case "--lang" when i + 1 < args.Length:
                     lang = args[++i];
+                    break;
+                case "--surface" when i + 1 < args.Length:
+                    surface = args[++i];
                     break;
                 case "--project" when i + 1 < args.Length:
                     projectPath = args[++i];
@@ -61,13 +63,13 @@ internal sealed class EmitOptions
                 default:
                     if (arg.StartsWith('-'))
                     {
-                        error = $"emit: unknown argument `{arg}`";
+                        error = $"unknown argument `{arg}`";
                         return false;
                     }
 
                     if (path is not null)
                     {
-                        error = "emit: multiple file paths";
+                        error = "multiple file paths";
                         return false;
                     }
 
@@ -78,19 +80,19 @@ internal sealed class EmitOptions
 
         if (projectPath is not null && path is not null)
         {
-            error = "emit: use either --project or a single file path, not both";
+            error = "use either --project or a single file path, not both";
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(projectPath) && string.IsNullOrWhiteSpace(path))
         {
-            error = "emit: missing file path or --project";
+            error = "missing file path or --project";
             return false;
         }
 
         if (!string.Equals(lang, "cs", StringComparison.OrdinalIgnoreCase))
         {
-            error = $"emit: unsupported --lang `{lang}` (wave-2 supports cs only)";
+            error = $"unsupported --lang `{lang}` (supports cs only)";
             return false;
         }
 
@@ -99,6 +101,7 @@ internal sealed class EmitOptions
             Path = path is null ? null : System.IO.Path.GetFullPath(path),
             ProjectPath = projectPath is null ? null : System.IO.Path.GetFullPath(projectPath),
             Lang = lang,
+            Surface = surface,
             WorkspaceRoot = workspaceRoot,
             Namespace = namespaceName,
             ClassName = className,

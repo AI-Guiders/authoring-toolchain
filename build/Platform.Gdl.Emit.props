@@ -1,15 +1,28 @@
 <Project>
-  <!-- SSOT: federation GDL emit → Generated/*.g.cs (GUIDERS-ADR-0059 Wave 1) -->
+
+  <!-- SSOT: federation GDL emit → Generated/*.g.cs via gdlc (GUIDERS-ADR-0059, ATC-ADR-0002) -->
+
   <Import Project="$(MSBuildThisFileDirectory)Platform.Gdl.Emit.targets" />
 
+
+
   <PropertyGroup>
+
     <AuthoringToolchainRoot Condition="'$(AuthoringToolchainRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\src\Authoring.Cli\Authoring.Cli.csproj')">$(MSBuildThisFileDirectory)..\</AuthoringToolchainRoot>
-    <GuidersAssistRoot Condition="'$(GuidersAssistRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\guiders-assist\src\AIGuiders.DotnetTools.DeckEmit\AIGuiders.DotnetTools.DeckEmit.csproj')">$(MSBuildThisFileDirectory)..\..\guiders-assist\</GuidersAssistRoot>
+
+
 
     <GdlEmitOutputDir Condition="'$(GdlEmitOutputDir)' == ''">$(MSBuildProjectDirectory)\Generated</GdlEmitOutputDir>
 
-    <GdlEmitAuthoringTool Condition="'$(GdlEmitAuthoringTool)' == '' and '$(AuthoringToolchainRoot)' != '' and Exists('$(AuthoringToolchainRoot)src\Authoring.Cli\bin\$(Configuration)\net10.0\authoring.dll')">$(AuthoringToolchainRoot)src\Authoring.Cli\bin\$(Configuration)\net10.0\authoring.dll</GdlEmitAuthoringTool>
-    <GdlEmitDeckTool Condition="'$(GdlEmitDeckTool)' == '' and '$(GuidersAssistRoot)' != '' and Exists('$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\bin\$(Configuration)\net10.0\AIGuiders.DotnetTools.DeckEmit.dll')">$(GuidersAssistRoot)src\AIGuiders.DotnetTools.DeckEmit\bin\$(Configuration)\net10.0\AIGuiders.DotnetTools.DeckEmit.dll</GdlEmitDeckTool>
+
+
     <GdlEmitGdlcTool Condition="'$(GdlEmitGdlcTool)' == '' and '$(AuthoringToolchainRoot)' != '' and Exists('$(AuthoringToolchainRoot)src\Gdlc.Cli\bin\$(Configuration)\net10.0\gdlc.dll')">$(AuthoringToolchainRoot)src\Gdlc.Cli\bin\$(Configuration)\net10.0\gdlc.dll</GdlEmitGdlcTool>
+
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="$(MSBuildProjectDirectory)\gdl-emit-verify\**" />
+  </ItemGroup>
+
 </Project>
+
