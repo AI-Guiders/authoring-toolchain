@@ -190,6 +190,13 @@ public sealed class GdlcEmitSmokeTests
 
     }
 
+    [Fact]
+    public void Sat_adr_fsharp_0007_runs_observer()
+    {
+        var exit = SatCommand.Run(["--adr", "GUIDERS-FSHARP-ADR-0007"]);
+        Assert.NotEqual(2, exit);
+    }
+
 
 
     private static string ResolveRepoPath(params string[] parts)

@@ -1,0 +1,29 @@
+# CDP newcomer setup profile — GUIDERS-ADR-0064 pilot (abbreviated)
+
+config cdp-newcomer
+
+based on adr:GUIDERS-ADR-0064
+
+import <federation/config/paths-grain>
+
+defaults
+  grammar.path.physical  = path-absolute-platform
+  grammar.path.scope_map = path-arrow-scope-id
+  grammar.knowledge.root = root-alias
+  grammar.hot.section    = markdown-section-tags
+  grammar.hot.public_cut = markdown-marker-public-cut
+end defaults
+
+sources table
+  | id           | kind              | path                                      | slice            |
+  | personal-hot | markdown_sections | {personal}/agent-notes.md                 | above_public_cut |
+  | l0-manifest  | json              | {personal}/knowledge/META/memory-architecture-v1.json | key:l0 |
+
+contracts table
+  | id              | requires            | ensures                 |
+  | hot.personal.l0 | primary_is_personal | hot_l0_sections_present |
+
+facts table
+  | contract        | verified_by                              |
+  | hot.personal.l0 | golden:GS-config-hot-l0-newcomer         |
+  | hot.personal.l0 | install-cdp.personal-seed@e1417c4        |

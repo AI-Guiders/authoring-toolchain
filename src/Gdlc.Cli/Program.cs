@@ -2,6 +2,7 @@ using Gdlc.Cli;
 using Gdlc.Plugins.Federation;
 
 GdlPluginBootstrap.Initialize();
+GdlSatBootstrap.Initialize();
 
 if (args.Length == 0)
 {
@@ -40,6 +41,8 @@ static int PrintUsage()
           gdlc validate [--lang=cs] [--surface=wpf] --project <file.gdlproj>
           gdlc sat [--lang=cs] [--surface=wpf] <file.{quarry}.gdl>
           gdlc sat [--lang=cs] [--surface=wpf] --project <file.gdlproj>
+          gdlc sat --adr=<ADR-ID> [--facts=<facts.md>] [--workspace <root>]
+          gdlc sat --facts=<facts.md> [--adr=<ADR-ID>]
           gdlc --version
           gdlc --help
 
@@ -56,6 +59,8 @@ static int PrintUsage()
           gdlc emit --lang=cs --surface=wpf samples/deck/dashspec-studio.deck.gdl --namespace Dash.Generated --out Generated/DeckIds.g.cs
           gdlc validate --project samples/planet/planet.gdlproj
           gdlc sat --project samples/planet/planet.gdlproj
+          gdlc sat --adr=GUIDERS-FSHARP-ADR-0007
+          gdlc sat --adr=GUIDERS-FSHARP-ADR-0007 --facts ../guiders-fsharp/docs/adr/GUIDERS-FSHARP-ADR-0007-open-build-ssot-ftc-correspondence.md
         """);
 
     return 0;
